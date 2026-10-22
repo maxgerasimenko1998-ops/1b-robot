@@ -96,6 +96,27 @@
      нажалось или нет (08.09). Теперь кнопка на полторы секунды зеленеет и пишет, что ушло. */
   button.otklik{ background:#1e8449 !important; box-shadow:inset 0 0 0 3px #7be495; transform:scale(.97); transition:transform .08s }
   button.otklik-net{ background:#8e2020 !important; box-shadow:inset 0 0 0 3px #f08080; }
+
+  /* 22.10: карточки сцены 1B */
+  .kcard{flex:1 1 100%;background:#171a21;border:1px solid #2b303b;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;scroll-margin-top:62px}
+  .kcard.kplayed{border-color:#2e7d4f;background:#152019}
+  .khead{display:flex;gap:10px;align-items:flex-start}
+  .knum{flex:none;min-width:34px;height:34px;border-radius:17px;padding:0 6px;background:var(--gold);color:#0b1638;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .kcard.kplayed .knum{background:#2e7d4f;color:#fff}
+  .kq{font-size:17px;font-weight:700;line-height:1.3;color:#fff}
+  .kru{font-size:13px;color:var(--dim);margin-top:2px}
+  .krow{display:flex;gap:7px}
+  .board .krow button.kbig{flex:1 1 auto;background:var(--purple);font-size:16px;padding:14px 12px;text-align:left}
+  .board .krow button.ken{flex:0 0 58px;background:#2d5f8f;font-size:14px;padding:14px 0}
+  .board .krow button.kdone{box-shadow:inset 0 0 0 2px #2ecc71}
+  .kfirst{font-size:12px;color:#8a8f98;margin:-3px 2px 3px;font-style:italic;line-height:1.35}
+  .kzapas{border-style:dashed}
+  .knav{position:sticky;top:0;z-index:40;flex:1 1 100%;display:flex;flex-wrap:nowrap;gap:4px;padding:6px 0;background:var(--bg)}
+  .board .knav button.knavb{flex:1 1 0;min-width:0;background:var(--card2);font-size:15px;padding:10px 0;font-weight:800}
+  #kbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#0f1114f0;border-top:1px solid #333;max-width:480px;margin:0 auto}
+  #kbar button{flex:1;font-size:17px;padding:14px 6px;min-height:58px}
+  #kbar #kbOt{background:#b8860b}
+  body{padding-bottom:96px}
 </style>
 </head>
 <body>
@@ -300,66 +321,96 @@
 // Всё остальное в файле читает ROBOT и само по себе не содержит ничего
 // специфичного для BoS-Bot. Копия под нового заказчика: новая папка/репозиторий,
 // новый префикс ns (см. предупреждение ниже), свой agent, свои режимы и кнопки.
+// 22.10: записи сцены (DE/EN) — их файл 1B + ответы Akin; сверены распознаванием
+const _K = {
+  g1_de: { label: "🇩🇪 1 · Приветствие", data: 'clips/de/g1.mp3', text: "Herzlich willkommen, meine Damen und Herren. Ich bin John Morley, Mitarbeiter von 1B. Ich bin heute hier, weil Roboter wie ich bald überall arbeiten werden: in Fabriken, in Lagern und eines Tages auch zu Hause. Und alles, was arbeitet, kann auch Schäden verursachen. Genau dafür gibt es 1B. 1B wurde aus mehreren hundert Startups ausgewählt und ist heute eines von drei Unternehmen auf dieser Bühne. Vielen Dank an Accelarium für die Einladung. Bühne frei für Akin Båmstedt." },
+  g1_en: { label: "🇬🇧 1 · Приветствие", data: 'clips/en/g1.mp3', text: "Welcome, ladies and gentlemen. I am John Morley, a 1B employee. I am here today because robots like me will soon work everywhere: in factories, in warehouses and one day at home. And anything that works can also cause damage. That is exactly why 1B exists. 1B was selected from several hundred startups and is one of three companies on this stage today. Many thanks to Accelarium for the invitation. Please welcome Akin Båmstedt." },
+  cue1_de: { label: "🇩🇪 Akin 1", data: 'clips/de/cue1.mp3', text: "1B Assurance AG entwickelt datengetriebene Versicherungslösungen und Embedded-Insurance-Infrastrukturen, um neuartige Risiken in Robotik, autonomen Technologien, künstlicher Intelligenz, Industriesystemen und digitalen Assets präzise zu bewerten und versicherbar zu machen." },
+  cue1_en: { label: "🇬🇧 Akin 1", data: 'clips/en/cue1.mp3', text: "1B Assurance AG develops data-driven insurance solutions and embedded insurance infrastructure to precisely assess new kinds of risk in robotics, autonomous technologies, artificial intelligence, industrial systems and digital assets, and to make them insurable." },
+  cue2_de: { label: "🇩🇪 Akin 2", data: 'clips/de/cue2.mp3', text: "Weil digitale Assets Vertrauen brauchen – und Roboter mehr als eine Elektronikversicherung." },
+  cue2_en: { label: "🇬🇧 Akin 2", data: 'clips/en/cue2.mp3', text: "Because digital assets need trust – and robots need more than electronics insurance." },
+  cue3_de: { label: "🇩🇪 Akin 3", data: 'clips/de/cue3.mp3', text: "Wir sprechen nicht nur mit der Allianz. Momentan geben wir Versicherern die Chance, mit uns zu arbeiten – auch eine HDI oder die Zürich prüfen unsere Produkte für den Zukunftsmarkt." },
+  cue3_en: { label: "🇬🇧 Akin 3", data: 'clips/en/cue3.mp3', text: "We are not only talking to Allianz. Right now we are giving insurers the chance to work with us – HDI and Zurich are also reviewing our products for the market of the future." },
+  f0_de: { label: "🇩🇪 Шаг 0", data: 'clips/de/f0.mp3', text: "Sehr gerne. Achtung: Was jetzt passiert, ist eine Simulation." },
+  f0_en: { label: "🇬🇧 Шаг 0", data: 'clips/en/f0.mp3', text: "With pleasure. Attention: what happens now is a simulation." },
+  f1_de: { label: "🇩🇪 Шаг 1", data: 'clips/de/f1.mp3', text: "Oh. Das war ich. Ein klassischer Haftpflichtschaden: Ich habe das Eigentum eines Gastes beschädigt. Zum Glück wurde niemand verletzt. Jetzt zeige ich Ihnen, was in diesem Moment im Hintergrund passiert." },
+  f1_en: { label: "🇬🇧 Шаг 1", data: 'clips/en/f1.mp3', text: "Oops. That was me. A classic liability claim: I damaged a guest's property. Luckily, nobody was hurt. Now let me show you what happens in the background right now." },
+  f2_de: { label: "🇩🇪 Шаг 2", data: 'clips/de/f2.mp3', text: "Meine Sensoren haben den Kontakt registriert: Zeitpunkt, Ort, Bewegungsrichtung, Kraft, Betriebsmodus und Software-Stand. Diese Daten werden sofort gesichert und manipulationssicher verankert." },
+  f2_en: { label: "🇬🇧 Шаг 2", data: 'clips/en/f2.mp3', text: "My sensors registered the contact: time, location, direction of movement, force, operating mode and software version. This data is secured immediately and anchored in a tamper-evident way." },
+  f3_de: { label: "🇩🇪 Шаг 3", data: 'clips/de/f3.mp3', text: "So soll es künftig ablaufen: In Sekunden entsteht automatisch eine Schadenmeldung in der 1B-Plattform, verknüpft mit meinem digitalen Risikoprofil, dem Private Risk Twin. Niemand muss ein Formular ausfüllen." },
+  f3_en: { label: "🇬🇧 Шаг 3", data: 'clips/en/f3.mp3', text: "This is how it is designed to work: within seconds, a claim notification is created automatically on the 1B platform, linked to my digital risk profile, the Private Risk Twin. Nobody has to fill in a form." },
+  f4_de: { label: "🇩🇪 Шаг 4", data: 'clips/de/f4.mp3', text: "Für diese Simulation nehmen wir an, ich wäre über HUMANO-SURE versichert, unsere Halterhaftpflicht für humanoide Roboter. Ein Sachschaden an Eigentum Dritter ist ein typischer gedeckter Fall, abzüglich des vereinbarten Selbstbehalts." },
+  f4_en: { label: "🇬🇧 Шаг 4", data: 'clips/en/f4.mp3', text: "For this simulation, let's assume I am insured under HUMANO-SURE, our operator liability cover for humanoid robots. Property damage to a third party is a typical covered case, minus the agreed deductible." },
+  f5_de: { label: "🇩🇪 Шаг 5", data: 'clips/de/f5.mp3', text: "Die strukturierte Schadenakte geht an den Risikoträger, im geplanten MGA-Modell die Allianz. Der Risikoträger entscheidet und entschädigt den betroffenen Gast. Der Kunde bleibt bei 1B, und die Daten fliessen zurück in unser Risikomodell." },
+  f5_en: { label: "🇬🇧 Шаг 5", data: 'clips/en/f5.mp3', text: "The structured claim file goes to the risk carrier, which in our planned MGA model is Allianz. The carrier decides and compensates the affected guest. The customer stays with 1B, and the data flows back into our risk model." },
+  f6_de: { label: "🇩🇪 Шаг 6", data: 'clips/de/f6.mp3', text: "Unser Ziel: Schadenmeldung in Sekunden statt Tagen und klare Fakten statt Streit über die Schuldfrage. Das war eine Simulation: Die Plattform ist in Entwicklung, und echter Versicherungsschutz besteht nur mit einem abgeschlossenen Vertrag. Aber so sieht die Zukunft der Roboterversicherung aus. 1B. Insure What's Next." },
+  f6_en: { label: "🇬🇧 Шаг 6", data: 'clips/en/f6.mp3', text: "Our goal: claim notification in seconds instead of days, and clear facts instead of arguments about fault. That was a simulation: the platform is in development, and real insurance cover only exists with a signed contract. But this is what the future of robot insurance looks like. 1B. Insure What's Next." },
+  cue5_de: { label: "🇩🇪 Akin 5", data: 'clips/de/cue5.mp3', text: "Weil wir mitten in der Industrie 4.0 sind. Das ist keine Zukunftsvision mehr, es passiert tatsächlich – zum Beispiel beim Einsatz humanoider Roboter im gewerblichen Bereich und vielem mehr. Terrox Robotic, der größte Reseller aus Deutschland, beschwerte sich, dass sie bei den Anfragen nicht mehr hinterherkommen." },
+  cue5_en: { label: "🇬🇧 Akin 5", data: 'clips/en/cue5.mp3', text: "Because we are in the middle of Industry 4.0. This is no longer a vision of the future – it is actually happening, for example with humanoid robots in commercial use and much more. Terrox Robotic, the largest reseller in Germany, complained that they can no longer keep up with the requests." },
+  cue6_de: { label: "🇩🇪 Akin 6", data: 'clips/de/cue6.mp3', text: "Hinter 1B steckt der Gründer Akin. Akin hat bereits 2018 sein erstes Unternehmen aus der Insurtech-Szene verkauft und anschließend in Unternehmen investiert. Kurz danach war er CEO eines Fintech- und Blockchain-Unternehmens. Als er die Versicherungslücken erkannt hat, brannte das Gründerfeuer wieder – und er startete 1B." },
+  cue6_en: { label: "🇬🇧 Akin 6", data: 'clips/en/cue6.mp3', text: "Behind 1B is its founder, Akin. Akin sold his first company from the insurtech scene back in 2018 and then invested in companies. Shortly after, he became CEO of a fintech and blockchain company. When he recognised the gaps in insurance, the founder's fire was burning again – and he started 1B." },
+  cue7_de: { label: "🇩🇪 Akin 7", data: 'clips/de/cue7.mp3', text: "Das Geld wird in der Vermögensverwaltung in der Schweiz deponiert, und damit wird global gewirtschaftet. Zu Dividenden und allem Weiteren rund ums Geld: Ich bin ein Roboter, kein professioneller Investor oder Finanzexperte – das erklärt Ihnen Akin am besten." },
+  cue7_en: { label: "🇬🇧 Akin 7", data: 'clips/en/cue7.mp3', text: "The money is deposited with asset management in Switzerland and put to work globally. As for dividends and everything else about the money: I'm a robot, not a professional investor or finance expert – Akin will explain that best." },
+  cue8_de: { label: "🇩🇪 Akin 8", data: 'clips/de/cue8.mp3', text: "Wenn man beide Märkte kombiniert, die noch so jungfräulich sind und auf die noch kein Versicherer einen Fokus setzt, sprechen wir von einem Markt, der über 200 Billionen wert ist." },
+  cue8_en: { label: "🇬🇧 Akin 8", data: 'clips/en/cue8.mp3', text: "If you combine both markets, which are still so untouched and which no insurer is focusing on yet, we are talking about a market worth more than 200 trillion." },
+  g4_de: { label: "🇩🇪 Прощание", data: 'clips/de/g4.mp3', text: "Vielen Dank für Ihre Aufmerksamkeit. Wenn Sie mehr über 1B erfahren möchten, sprechen Sie Akin und das Team direkt an, und folgen Sie 1B auf LinkedIn. 1B. Insure What's Next." },
+  g4_en: { label: "🇬🇧 Прощание", data: 'clips/en/g4.mp3', text: "Thank you very much for your attention. If you would like to learn more about 1B, please talk to Akin and the team directly, and follow 1B on LinkedIn. 1B. Insure What's Next." },
+  a8_nv_de: { label: "🇩🇪 Не расслышал", data: 'clips/de/a8_nv.mp3', sluzh: true, text: "Entschuldigung, ich habe Sie akustisch nicht verstanden. Können Sie die Frage wiederholen?" },
+  a8_nv_en: { label: "🇬🇧 Не расслышал", data: 'clips/en/a8_nv.mp3', sluzh: true, text: "Sorry, I didn't catch that. Could you repeat the question?" },
+  a8_pause_de: { label: "🇩🇪 Пауза", data: 'clips/de/a8_pause.mp3', sluzh: true, text: "Einen kleinen Moment, ich sortiere meine Gedanken." },
+  a8_pause_en: { label: "🇬🇧 Пауза", data: 'clips/en/a8_pause.mp3', sluzh: true, text: "Just a moment, I'm collecting my thoughts." },
+  fC_de: { label: "🇩🇪 Сценарий C", data: 'clips/de/fC.mp3', text: "Achtung, Simulation. Unautorisierter Zugriffsversuch erkannt. Ich gehe in den sicheren Halt. Alle Protokolle werden gesichert, das Sicherheitsteam wird alarmiert. Bei vernetzten Robotern deckt eine Cyberkomponente Forensik, Wiederherstellung und, je nach Vertrag, Betriebsunterbrechung und Schäden Dritter. Für die Prämie zählen Software-Stand, Updates und Netzwerkanbindung. Das war eine Simulation." },
+  fC_en: { label: "🇬🇧 Сценарий C", data: 'clips/en/fC.mp3', text: "Attention, simulation. Unauthorized access attempt detected. I am going into a safe stop. All logs are secured and the security team is alerted. For connected robots, a cyber component covers forensics, recovery and, depending on the contract, business interruption and third-party damage. For pricing, software version, updates and network connection matter. That was a simulation." },
+  g3_de: { label: "🇩🇪 Переход", data: 'clips/de/g3.mp3', text: "Gerne beantworte ich jetzt Ihre Fragen zu 1B. Für Konditionen und Zahlen ist Akin der richtige Ansprechpartner." },
+  g3_en: { label: "🇬🇧 Переход", data: 'clips/en/g3.mp3', text: "I am happy to answer your questions about 1B now. For terms and figures, Akin is the right person to ask." },
+  fB_de: { label: "🇩🇪 Сценарий B", data: 'clips/de/fB.mp3', text: "Achtung, Simulation. Meine Sensoren melden eine plötzliche Überlastung im linken Kniegelenk. Die Daten zeigen: kein Verschleiss, sondern ein plötzliches Ereignis direkt nach einem Stoss. Genau diese Unterscheidung ist für die Versicherung entscheidend, denn Verschleiss ist nicht versichert, ein plötzlicher Schaden schon. Die Reparaturkosten werden nach Vertrag reguliert, abzüglich Selbstbehalt. Das war eine Simulation." },
+  fB_en: { label: "🇬🇧 Сценарий B", data: 'clips/en/fB.mp3', text: "Attention, simulation. My sensors report a sudden overload in my left knee joint. The data shows no wear and tear, but a sudden event right after an impact. That distinction is crucial for insurance: wear and tear is not covered, sudden damage is. Repair costs are settled according to the contract, minus the deductible. That was a simulation." },
+};
 const ROBOT = {
   ns: '1b:',                                     // префикс памяти браузера — СВОЙ у каждого пульта (домен GitHub Pages общий)
   agent: 'agent_2401m59xj355f2hr8g1pwgank45d',  // мозг John Morley (deploy_robot.py --robot 1b-assurance)
   title: '1B · John Morley',
-  version: '22.10.2026 1B · 5',
+  version: '22.10.2026 1B · 6',
   dayCtx: 'Investoren-Event in Frankfurt am Main, 22. Oktober 2026. Accelarium hat eingeladen; 1B ist eines von drei Unternehmen auf der Bühne. Du bist John Morley, auf der Bühne mit Akin Båmstedt; danach Fragen aus dem Saal und Gespräche mit Investoren.',
 
   // Реплики сцены — их файл 1B (G1, G2, F2, G3, G4, A8, F3, F4) слово в слово, голос Максимилиана со словарём A10;
   // каждая запись сверена распознаванием 19.10. 🇩🇪 и 🇬🇧 — одна и та же реплика. text уходит мозгу тихой заметкой,
   // чтобы на уточняющий вопрос он знал, что «сказал».
-  clips: [
-    { head: "Сцена" },
-    { label: "🇩🇪 1 · Приветствие (G1)", data: 'clips/de/g1.mp3', half: true, text: "Herzlich willkommen, meine Damen und Herren. Ich bin John Morley, Mitarbeiter von 1B. Ich bin heute hier, weil Roboter wie ich bald überall arbeiten werden: in Fabriken, in Lagern und eines Tages auch zu Hause. Und alles, was arbeitet, kann auch Schäden verursachen. Genau dafür gibt es 1B. 1B wurde aus mehreren hundert Startups ausgewählt und ist heute eines von drei Unternehmen auf dieser Bühne. Vielen Dank an Accelarium für die Einladung. Bühne frei für Akin Båmstedt." },
-    { label: "🇬🇧 1 · Приветствие (G1)", data: 'clips/en/g1.mp3', half: true, text: "Welcome, ladies and gentlemen. I am John Morley, a 1B employee. I am here today because robots like me will soon work everywhere: in factories, in warehouses and one day at home. And anything that works can also cause damage. That is exactly why 1B exists. 1B was selected from several hundred startups and is one of three companies on this stage today. Many thanks to Accelarium for the invitation. Please welcome Akin Båmstedt." },
-    { head: "Вопросы Akin" },
-    { label: "🇩🇪 Akin 1 · 1B одним предложением", data: 'clips/de/cue1.mp3', half: true, text: "1B Assurance AG entwickelt datengetriebene Versicherungslösungen und Embedded-Insurance-Infrastrukturen, um neuartige Risiken in Robotik, autonomen Technologien, künstlicher Intelligenz, Industriesystemen und digitalen Assets präzise zu bewerten und versicherbar zu machen." },
-    { label: "🇬🇧 Akin 1 · 1B одним предложением", data: 'clips/en/cue1.mp3', half: true, text: "1B Assurance AG develops data-driven insurance solutions and embedded insurance infrastructure to precisely assess new kinds of risk in robotics, autonomous technologies, artificial intelligence, industrial systems and digital assets, and to make them insurable." },
-    { label: "🇩🇪 Akin 2 · две бизнес-модели", data: 'clips/de/cue2.mp3', half: true, text: "Weil digitale Assets Vertrauen brauchen – und Roboter mehr als eine Elektronikversicherung." },
-    { label: "🇬🇧 Akin 2 · две бизнес-модели", data: 'clips/en/cue2.mp3', half: true, text: "Because digital assets need trust – and robots need more than electronics insurance." },
-    { label: "🇩🇪 Akin 3 · Allianz", data: 'clips/de/cue3.mp3', half: true, text: "Wir sprechen nicht nur mit der Allianz. Momentan geben wir Versicherern die Chance, mit uns zu arbeiten – auch eine HDI oder die Zürich prüfen unsere Produkte für den Zukunftsmarkt." },
-    { label: "🇬🇧 Akin 3 · Allianz", data: 'clips/en/cue3.mp3', half: true, text: "We are not only talking to Allianz. Right now we are giving insurers the chance to work with us – HDI and Zurich are also reviewing our products for the market of the future." },
-    { head: "Akin 4 · «Zeig uns, was passiert…» / «уронить предмет» — симуляция" },
-    { label: "🇩🇪 Шаг 0 · «Sehr gerne. Achtung: Simulation» → робот роняет предмет", data: 'clips/de/f0.mp3', half: true, text: "Sehr gerne. Achtung: Was jetzt passiert, ist eine Simulation." },
-    { label: "🇬🇧 Шаг 0 · «Sehr gerne. Achtung: Simulation» → робот роняет предмет", data: 'clips/en/f0.mp3', half: true, text: "With pleasure. Attention: what happens now is a simulation." },
-    { label: "🇩🇪 Шаг 1 · реакция", data: 'clips/de/f1.mp3', half: true, text: "Oh. Das war ich. Ein klassischer Haftpflichtschaden: Ich habe das Eigentum eines Gastes beschädigt. Zum Glück wurde niemand verletzt. Jetzt zeige ich Ihnen, was in diesem Moment im Hintergrund passiert." },
-    { label: "🇬🇧 Шаг 1 · реакция", data: 'clips/en/f1.mp3', half: true, text: "Oops. That was me. A classic liability claim: I damaged a guest's property. Luckily, nobody was hurt. Now let me show you what happens in the background right now." },
-    { label: "🇩🇪 Шаг 2 · датчики", data: 'clips/de/f2.mp3', half: true, text: "Meine Sensoren haben den Kontakt registriert: Zeitpunkt, Ort, Bewegungsrichtung, Kraft, Betriebsmodus und Software-Stand. Diese Daten werden sofort gesichert und manipulationssicher verankert." },
-    { label: "🇬🇧 Шаг 2 · датчики", data: 'clips/en/f2.mp3', half: true, text: "My sensors registered the contact: time, location, direction of movement, force, operating mode and software version. This data is secured immediately and anchored in a tamper-evident way." },
-    { label: "🇩🇪 Шаг 3 · заявление о случае", data: 'clips/de/f3.mp3', half: true, text: "So soll es künftig ablaufen: In Sekunden entsteht automatisch eine Schadenmeldung in der 1B-Plattform, verknüpft mit meinem digitalen Risikoprofil, dem Private Risk Twin. Niemand muss ein Formular ausfüllen." },
-    { label: "🇬🇧 Шаг 3 · заявление о случае", data: 'clips/en/f3.mp3', half: true, text: "This is how it is designed to work: within seconds, a claim notification is created automatically on the 1B platform, linked to my digital risk profile, the Private Risk Twin. Nobody has to fill in a form." },
-    { label: "🇩🇪 Шаг 4 · HUMANO-SURE", data: 'clips/de/f4.mp3', half: true, text: "Für diese Simulation nehmen wir an, ich wäre über HUMANO-SURE versichert, unsere Halterhaftpflicht für humanoide Roboter. Ein Sachschaden an Eigentum Dritter ist ein typischer gedeckter Fall, abzüglich des vereinbarten Selbstbehalts." },
-    { label: "🇬🇧 Шаг 4 · HUMANO-SURE", data: 'clips/en/f4.mp3', half: true, text: "For this simulation, let's assume I am insured under HUMANO-SURE, our operator liability cover for humanoid robots. Property damage to a third party is a typical covered case, minus the agreed deductible." },
-    { label: "🇩🇪 Шаг 5 · Allianz урегулирует", data: 'clips/de/f5.mp3', half: true, text: "Die strukturierte Schadenakte geht an den Risikoträger, im geplanten MGA-Modell die Allianz. Der Risikoträger entscheidet und entschädigt den betroffenen Gast. Der Kunde bleibt bei 1B, und die Daten fliessen zurück in unser Risikomodell." },
-    { label: "🇬🇧 Шаг 5 · Allianz урегулирует", data: 'clips/en/f5.mp3', half: true, text: "The structured claim file goes to the risk carrier, which in our planned MGA model is Allianz. The carrier decides and compensates the affected guest. The customer stays with 1B, and the data flows back into our risk model." },
-    { label: "🇩🇪 Шаг 6 · итог, Insure What's Next", data: 'clips/de/f6.mp3', half: true, text: "Unser Ziel: Schadenmeldung in Sekunden statt Tagen und klare Fakten statt Streit über die Schuldfrage. Das war eine Simulation: Die Plattform ist in Entwicklung, und echter Versicherungsschutz besteht nur mit einem abgeschlossenen Vertrag. Aber so sieht die Zukunft der Roboterversicherung aus. 1B. Insure What's Next." },
-    { label: "🇬🇧 Шаг 6 · итог, Insure What's Next", data: 'clips/en/f6.mp3', half: true, text: "Our goal: claim notification in seconds instead of days, and clear facts instead of arguments about fault. That was a simulation: the platform is in development, and real insurance cover only exists with a signed contract. But this is what the future of robot insurance looks like. 1B. Insure What's Next." },
-    { head: "Вопросы Akin (дальше)" },
-    { label: "🇩🇪 Akin 5 · почему сейчас", data: 'clips/de/cue5.mp3', half: true, text: "Weil wir mitten in der Industrie 4.0 sind. Das ist keine Zukunftsvision mehr, es passiert tatsächlich – zum Beispiel beim Einsatz humanoider Roboter im gewerblichen Bereich und vielem mehr. Terrox Robotic, der größte Reseller aus Deutschland, beschwerte sich, dass sie bei den Anfragen nicht mehr hinterherkommen." },
-    { label: "🇬🇧 Akin 5 · почему сейчас", data: 'clips/en/cue5.mp3', half: true, text: "Because we are in the middle of Industry 4.0. This is no longer a vision of the future – it is actually happening, for example with humanoid robots in commercial use and much more. Terrox Robotic, the largest reseller in Germany, complained that they can no longer keep up with the requests." },
-    { label: "🇩🇪 Akin 6 · кто за 1B", data: 'clips/de/cue6.mp3', half: true, text: "Hinter 1B steckt der Gründer Akin. Akin hat bereits 2018 sein erstes Unternehmen aus der Insurtech-Szene verkauft und anschließend in Unternehmen investiert. Kurz danach war er CEO eines Fintech- und Blockchain-Unternehmens. Als er die Versicherungslücken erkannt hat, brannte das Gründerfeuer wieder – und er startete 1B." },
-    { label: "🇬🇧 Akin 6 · кто за 1B", data: 'clips/en/cue6.mp3', half: true, text: "Behind 1B is its founder, Akin. Akin sold his first company from the insurtech scene back in 2018 and then invested in companies. Shortly after, he became CEO of a fintech and blockchain company. When he recognised the gaps in insurance, the founder's fire was burning again – and he started 1B." },
-    { label: "🇩🇪 Akin 7 · деньги инвесторов", data: 'clips/de/cue7.mp3', half: true, text: "Das Geld wird in der Vermögensverwaltung in der Schweiz deponiert, und damit wird global gewirtschaftet. Zu Dividenden und allem Weiteren rund ums Geld: Ich bin ein Roboter, kein professioneller Investor oder Finanzexperte – das erklärt Ihnen Akin am besten." },
-    { label: "🇬🇧 Akin 7 · деньги инвесторов", data: 'clips/en/cue7.mp3', half: true, text: "The money is deposited with asset management in Switzerland and put to work globally. As for dividends and everything else about the money: I'm a robot, not a professional investor or finance expert – Akin will explain that best." },
-    { label: "🇩🇪 Akin 8 · размер рынка", data: 'clips/de/cue8.mp3', half: true, text: "Wenn man beide Märkte kombiniert, die noch so jungfräulich sind und auf die noch kein Versicherer einen Fokus setzt, sprechen wir von einem Markt, der über 200 Billionen wert ist." },
-    { label: "🇬🇧 Akin 8 · размер рынка", data: 'clips/en/cue8.mp3', half: true, text: "If you combine both markets, which are still so untouched and which no insurer is focusing on yet, we are talking about a market worth more than 200 trillion." },
-    { head: "Финал" },
-    { label: "🇩🇪 Переход к вопросам зала (G3)", data: 'clips/de/g3.mp3', half: true, text: "Gerne beantworte ich jetzt Ihre Fragen zu 1B. Für Konditionen und Zahlen ist Akin der richtige Ansprechpartner." },
-    { label: "🇬🇧 Переход к вопросам зала (G3)", data: 'clips/en/g3.mp3', half: true, text: "I am happy to answer your questions about 1B now. For terms and figures, Akin is the right person to ask." },
-    { label: "🇩🇪 Прощание (G4)", data: 'clips/de/g4.mp3', half: true, text: "Vielen Dank für Ihre Aufmerksamkeit. Wenn Sie mehr über 1B erfahren möchten, sprechen Sie Akin und das Team direkt an, und folgen Sie 1B auf LinkedIn. 1B. Insure What's Next." },
-    { label: "🇬🇧 Прощание (G4)", data: 'clips/en/g4.mp3', half: true, text: "Thank you very much for your attention. If you would like to learn more about 1B, please talk to Akin and the team directly, and follow 1B on LinkedIn. 1B. Insure What's Next." },
-    { head: "Служебные" },
-    { label: "🇩🇪 Не расслышал", data: 'clips/de/a8_nv.mp3', half: true, sluzh: true, text: "Entschuldigung, ich habe Sie akustisch nicht verstanden. Können Sie die Frage wiederholen?" },
-    { label: "🇬🇧 Не расслышал", data: 'clips/en/a8_nv.mp3', half: true, sluzh: true, text: "Sorry, I didn't catch that. Could you repeat the question?" },
-    { label: "🇩🇪 Пауза «sortiere meine Gedanken»", data: 'clips/de/a8_pause.mp3', half: true, sluzh: true, text: "Einen kleinen Moment, ich sortiere meine Gedanken." },
-    { label: "🇬🇧 Пауза «sortiere meine Gedanken»", data: 'clips/en/a8_pause.mp3', half: true, sluzh: true, text: "Just a moment, I'm collecting my thoughts." },
-    { head: "Запасные сценарии (только по команде)" },
-    { label: "🇩🇪 Сценарий B · колено", data: 'clips/de/fB.mp3', half: true, text: "Achtung, Simulation. Meine Sensoren melden eine plötzliche Überlastung im linken Kniegelenk. Die Daten zeigen: kein Verschleiss, sondern ein plötzliches Ereignis direkt nach einem Stoss. Genau diese Unterscheidung ist für die Versicherung entscheidend, denn Verschleiss ist nicht versichert, ein plötzlicher Schaden schon. Die Reparaturkosten werden nach Vertrag reguliert, abzüglich Selbstbehalt. Das war eine Simulation." },
-    { label: "🇬🇧 Сценарий B · колено", data: 'clips/en/fB.mp3', half: true, text: "Attention, simulation. My sensors report a sudden overload in my left knee joint. The data shows no wear and tear, but a sudden event right after an impact. That distinction is crucial for insurance: wear and tear is not covered, sudden damage is. Repair costs are settled according to the contract, minus the deductible. That was a simulation." },
-    { label: "🇩🇪 Сценарий C · кибератака", data: 'clips/de/fC.mp3', half: true, text: "Achtung, Simulation. Unautorisierter Zugriffsversuch erkannt. Ich gehe in den sicheren Halt. Alle Protokolle werden gesichert, das Sicherheitsteam wird alarmiert. Bei vernetzten Robotern deckt eine Cyberkomponente Forensik, Wiederherstellung und, je nach Vertrag, Betriebsunterbrechung und Schäden Dritter. Für die Prämie zählen Software-Stand, Updates und Netzwerkanbindung. Das war eine Simulation." },
-    { label: "🇬🇧 Сценарий C · кибератака", data: 'clips/en/fC.mp3', half: true, text: "Attention, simulation. Unauthorized access attempt detected. I am going into a safe stop. All logs are secured and the security team is alerted. For connected robots, a cyber component covers forensics, recovery and, depending on the contract, business interruption and third-party damage. For pricing, software version, updates and network connection matter. That was a simulation." },
+  clips: Object.values(_K),
+  // 22.10 (Макс): карточки — вопрос Akin крупно над кнопкой, чтобы найти ответ, если он пойдёт не по порядку
+  cards: [
+    { id: "start", nav: "▶", num: "▶", q: "Открытие — робот начинает", qru: "приветствие зала, в конце «Bühne frei für Akin Båmstedt»", items: [
+      { name: "Приветствие", dur: 30, first: "Herzlich willkommen, meine Damen und Herren. Ich bin John Morley, Mitarbeiter …", de: _K.g1_de, en: _K.g1_en } ] },
+    { id: "q1", nav: "1", num: "1", q: "Erklär den Investoren in einem Satz, was 1B macht.", qru: "одним предложением — что делает 1B", items: [
+      { name: "Ответ", dur: 20, first: "1B Assurance AG entwickelt datengetriebene Versicherungslösungen und …", de: _K.cue1_de, en: _K.cue1_en } ] },
+    { id: "q2", nav: "2", num: "2", q: "Warum haben wir zwei Geschäftsmodelle?", qru: "почему две бизнес-модели", items: [
+      { name: "Ответ", dur: 7, first: "Weil digitale Assets Vertrauen brauchen – und Roboter mehr als eine …", de: _K.cue2_de, en: _K.cue2_en } ] },
+    { id: "q3", nav: "3", num: "3", q: "Wie weit sind wir mit der Allianz?", qru: "как дела с Allianz", items: [
+      { name: "Ответ", dur: 11, first: "Wir sprechen nicht nur mit der Allianz. Momentan geben wir Versicherern die …", de: _K.cue3_de, en: _K.cue3_en } ] },
+    { id: "q4", nav: "4🏺", num: "4", q: "Zeig uns, was passiert, wenn etwas schiefgeht.", qru: "ВАЗА — симуляция ущерба, 7 реплик по порядку", items: [
+      { name: "Шаг 0 · «Achtung: Simulation» → робот роняет вазу", dur: 5, first: "Sehr gerne. Achtung: Was jetzt passiert, ist eine Simulation.", de: _K.f0_de, en: _K.f0_en },
+      { name: "Шаг 1 · «Oh. Das war ich»", dur: 13, first: "Oh. Das war ich. Ein klassischer Haftpflichtschaden: Ich habe das Eigentum …", de: _K.f1_de, en: _K.f1_en },
+      { name: "Шаг 2 · датчики", dur: 13, first: "Meine Sensoren haben den Kontakt registriert: Zeitpunkt, Ort, …", de: _K.f2_de, en: _K.f2_en },
+      { name: "Шаг 3 · заявление за секунды", dur: 14, first: "So soll es künftig ablaufen: In Sekunden entsteht automatisch eine …", de: _K.f3_de, en: _K.f3_en },
+      { name: "Шаг 4 · HUMANO-SURE", dur: 14, first: "Für diese Simulation nehmen wir an, ich wäre über HUMANO-SURE versichert, …", de: _K.f4_de, en: _K.f4_en },
+      { name: "Шаг 5 · Allianz урегулирует", dur: 19, first: "Die strukturierte Schadenakte geht an den Risikoträger, im geplanten …", de: _K.f5_de, en: _K.f5_en },
+      { name: "Шаг 6 · «Das war eine Simulation…»", dur: 24, first: "Unser Ziel: Schadenmeldung in Sekunden statt Tagen und klare Fakten statt …", de: _K.f6_de, en: _K.f6_en } ] },
+    { id: "q5", nav: "5", num: "5", q: "Warum ist jetzt der richtige Zeitpunkt?", qru: "почему сейчас", items: [
+      { name: "Ответ", dur: 18, first: "Weil wir mitten in der Industrie 4.0 sind. Das ist keine Zukunftsvision mehr, …", de: _K.cue5_de, en: _K.cue5_en } ] },
+    { id: "q6", nav: "6", num: "6", q: "Wer steht hinter 1B?", qru: "кто стоит за 1B", items: [
+      { name: "Ответ", dur: 22, first: "Hinter 1B steckt der Gründer Akin. Akin hat bereits 2018 sein erstes …", de: _K.cue6_de, en: _K.cue6_en } ] },
+    { id: "q7", nav: "7", num: "7", q: "Was passiert mit dem Geld der Investoren?", qru: "деньги инвесторов", items: [
+      { name: "Ответ", dur: 18, first: "Das Geld wird in der Vermögensverwaltung in der Schweiz deponiert, und damit …", de: _K.cue7_de, en: _K.cue7_en } ] },
+    { id: "q8", nav: "8", num: "8", q: "Wie gross ist der Markt?", qru: "размер рынка", items: [
+      { name: "Ответ", dur: 12, first: "Wenn man beide Märkte kombiniert, die noch so jungfräulich sind und auf die …", de: _K.cue8_de, en: _K.cue8_en } ] },
+    { id: "end", nav: "■", num: "■", q: "Прощание — робот заканчивает", qru: "дальше вопросы зала ведёт Akin", items: [
+      { name: "Прощание", dur: 14, first: "Vielen Dank für Ihre Aufmerksamkeit. Wenn Sie mehr über 1B erfahren möchten, …", de: _K.g4_de, en: _K.g4_en } ] },
+    { id: "zapas", nav: "+", num: "+", q: "Запасные и служебные", qru: "только если понадобится", items: [
+      { name: "Не расслышал", dur: 5, first: "Entschuldigung, ich habe Sie akustisch nicht verstanden. Können Sie die Frage …", de: _K.a8_nv_de, en: _K.a8_nv_en },
+      { name: "Пауза «sortiere meine Gedanken»", dur: 3, first: "Einen kleinen Moment, ich sortiere meine Gedanken.", de: _K.a8_pause_de, en: _K.a8_pause_en },
+      { name: "Кибератака — если ваза не упала", dur: 27, first: "Achtung, Simulation. Unautorisierter Zugriffsversuch erkannt. Ich gehe in den …", de: _K.fC_de, en: _K.fC_en },
+      { name: "Переход к вопросам зала (сейчас не используем)", dur: 8, first: "Gerne beantworte ich jetzt Ihre Fragen zu 1B. Für Konditionen und Zahlen ist …", de: _K.g3_de, en: _K.g3_en },
+      { name: "Сценарий B · колено (не делать)", dur: 29, first: "Achtung, Simulation. Meine Sensoren melden eine plötzliche Überlastung im …", de: _K.fB_de, en: _K.fB_en } ] },
   ],
 
   // Копия пульта huk-roboter (= ninjaone-bot = vives-bot, решение Макса: пульт — копия лучшего готового).
@@ -551,15 +602,7 @@ const boardAudio=new Audio();
 function renderBoard(){
   const b=$('board'); b.innerHTML='';
   // 15.10 (HUK): клипы сценария зашиты в файл (ROBOT.clips) — рисуются первыми и не удаляются
-  (ROBOT.clips||[]).forEach(c=>{
-    // 19.10 (1B): заголовок группы и пары 🇩🇪/🇬🇧 в одну строку
-    if(c.head){ const h=document.createElement('div'); h.className='hint'; h.style.cssText='flex:1 1 100%;margin-top:8px;font-weight:600;font-size:14px;color:#cfd6df'; h.textContent=c.head; b.appendChild(h); return; }
-    const btn=document.createElement('button'); btn.textContent='▶ '+c.label;
-    btn.style.cssText=c.half?'flex:1 1 46%;text-align:left':'flex:1 1 100%;text-align:left';
-    if(String(c.data).includes('/en/')) btn.style.background='#2d5f8f';   // 🇬🇧 — другим цветом, чтобы не промахнуться
-    btn.onclick=()=>playClip(c, btn);
-    b.appendChild(btn);
-  });
+  if(ROBOT.cards){ renderKarty(b); }
   if(!clips.length && !(ROBOT.clips||[]).length){ b.innerHTML='<p class="hint">Пока нет точных фраз. Добавь ниже.</p>'; }
   clips.forEach((c,i)=>{
     const btn=document.createElement('button'); btn.textContent='▶ '+c.label;
@@ -568,6 +611,39 @@ function renderBoard(){
     b.appendChild(btn);
   });
 }
+
+// 22.10 (Макс): карточки сцены. Вопрос Akin крупно над кнопкой ответа, сверху — переходы к нужной карточке,
+// сыгранная карточка — зелёная. 🇩🇪 — большая кнопка, 🇬🇧 — маленькая справа.
+const _esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function renderKarty(b){
+  const nav=document.createElement('div'); nav.className='knav';
+  ROBOT.cards.forEach(k=>{ const a=document.createElement('button'); a.className='knavb'; a.textContent=k.nav;
+    a.onclick=()=>{ document.getElementById('k-'+k.id)?.scrollIntoView({behavior:'smooth',block:'start'}); }; nav.appendChild(a); });
+  b.appendChild(nav);
+  ROBOT.cards.forEach(k=>{
+    const card=document.createElement('div'); card.className='kcard'+(k.id==='zapas'?' kzapas':''); card.id='k-'+k.id;
+    card.innerHTML='<div class="khead"><span class="knum">'+_esc(k.num)+'</span><div><div class="kq">'+_esc(k.q)+'</div><div class="kru">'+_esc(k.qru)+'</div></div></div>';
+    k.items.forEach(it=>{
+      const row=document.createElement('div'); row.className='krow';
+      const big=document.createElement('button'); big.className='kbig'; big.textContent='▶ '+it.name+' · '+it.dur+' с'; big.title=it.de.label;
+      big.onclick=()=>{ playClip(it.de,big); card.classList.add('kplayed'); big.classList.add('kdone'); };
+      const en=document.createElement('button'); en.className='ken'; en.textContent='EN'; en.title=it.en.label;
+      en.onclick=()=>{ playClip(it.en,en); card.classList.add('kplayed'); en.classList.add('kdone'); };
+      row.append(big,en); card.appendChild(row);
+      const f=document.createElement('div'); f.className='kfirst'; f.textContent='«'+it.first+'»'; card.appendChild(f);
+    });
+    b.appendChild(card);
+  });
+}
+// записи — сразу под главными кнопками, а не в конце страницы
+(()=>{ try{ const bc=$('board')?.closest('.card'), after=$('hushBtn2'); if(bc&&after) after.after(bc); }catch{} })();
+// ✋ ХВАТИТ и ⏭ ОТВЕЧАЙ всегда внизу экрана — нажимают те же кнопки пульта
+(()=>{ const bar=document.createElement('div'); bar.id='kbar'; bar.innerHTML='<button id="kbOt"></button><button id="kbHv"></button>'; document.body.appendChild(bar);
+  const hv=$('kbHv'), ot=$('kbOt'); hv.onclick=e=>{ e.preventDefault(); $('stopTalk')?.click(); }; ot.onclick=e=>{ e.preventDefault(); $('answerNow')?.click(); };
+  setInterval(()=>{ const st=$('stopTalk'), an=$('answerNow'), lv=$('live'); const vis=lv && lv.style.display!=='none' && !lv.classList.contains('hidden');
+    bar.style.display=vis?'flex':'none';
+    if(st){ hv.innerHTML=st.innerHTML; hv.style.background=st.style.background||'#8e2020'; }
+    if(an){ ot.innerHTML=an.innerHTML; ot.disabled=an.disabled; } }, 250); })();
 let boardTimer=null, boardWatchdog=null;
 function releaseBoard(msg){
   clearTimeout(boardTimer); clearTimeout(boardWatchdog);
@@ -575,7 +651,7 @@ function releaseBoard(msg){
   if(msg) log(msg);
 }
 // 1B (аудит 19.10): записи сцены — в память телефона сразу при открытии пульта. Сцене не нужен мозг — пусть не нужна и сеть.
-const KLIP_V='2210c';   // переозвучил запись — поменяй метку (урок эфира 21.08)
+const KLIP_V='2210d';   // переозвучил запись — поменяй метку (урок эфира 21.08)
 function klipyVPamyat(){
   const vse=(ROBOT.clips||[]).filter(c=>c.data); let gotovo=0, oshibok=0;
   const pokaz=()=>{ const l=$('board')?.previousElementSibling;
