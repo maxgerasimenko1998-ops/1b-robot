@@ -304,7 +304,7 @@ const ROBOT = {
   ns: '1b:',                                     // префикс памяти браузера — СВОЙ у каждого пульта (домен GitHub Pages общий)
   agent: 'agent_2401m59xj355f2hr8g1pwgank45d',  // мозг John Morley (deploy_robot.py --robot 1b-assurance)
   title: '1B · John Morley',
-  version: '22.10.2026 1B · 3',
+  version: '22.10.2026 1B · 4',
   dayCtx: 'Investoren-Event in Frankfurt am Main, 22. Oktober 2026. Accelarium hat eingeladen; 1B ist eines von drei Unternehmen auf der Bühne. Du bist John Morley, auf der Bühne mit Akin Båmstedt; danach Fragen aus dem Saal und Gespräche mit Investoren.',
 
   // Реплики сцены — их файл 1B (G1, G2, F2, G3, G4, A8, F3, F4) слово в слово, голос Максимилиана со словарём A10;
@@ -341,8 +341,8 @@ const ROBOT = {
     { label: "🇬🇧 Akin 5 · почему сейчас", data: 'clips/en/cue5.mp3', half: true, text: "Because we are in the middle of Industry 4.0. This is no longer a vision of the future – it is actually happening, for example with humanoid robots in commercial use and much more. Terra Robotics, the largest reseller in Germany, complained that they can no longer keep up with the requests – and that is in Germany, not in New York." },
     { label: "🇩🇪 Akin 6 · кто за 1B", data: 'clips/de/cue6.mp3', half: true, text: "Hinter 1B steckt der Gründer Akin. Akin hat bereits 2018 sein erstes Unternehmen aus der Insurtech-Szene verkauft und anschließend in Unternehmen investiert. Kurz danach war er CEO eines Fintech- und Blockchain-Unternehmens. Als er die Versicherungslücken erkannt hat, brannte das Gründerfeuer wieder – und er startete 1B." },
     { label: "🇬🇧 Akin 6 · кто за 1B", data: 'clips/en/cue6.mp3', half: true, text: "Behind 1B is its founder, Akin. Akin sold his first company from the insurtech scene back in 2018 and then invested in companies. Shortly after, he became CEO of a fintech and blockchain company. When he recognised the gaps in insurance, the founder's fire was burning again – and he started 1B." },
-    { label: "🇩🇪 Akin 7 · деньги инвесторов", data: 'clips/de/cue7.mp3', half: true, text: "Das Geld wird in der Vermögensverwaltung in der Schweiz deponiert, und damit wird global gewirtschaftet. Dividenden werden wieder in die Schweiz abgeführt und an die Investoren ausgezahlt." },
-    { label: "🇬🇧 Akin 7 · деньги инвесторов", data: 'clips/en/cue7.mp3', half: true, text: "The money is deposited with asset management in Switzerland and put to work globally. Dividends flow back to Switzerland and are paid out to the investors." },
+    { label: "🇩🇪 Akin 7 · деньги инвесторов", data: 'clips/de/cue7.mp3', half: true, text: "Das Geld wird in der Vermögensverwaltung in der Schweiz deponiert, und damit wird global gewirtschaftet. Zu Dividenden und allem Weiteren rund ums Geld: Ich bin ein Roboter, kein professioneller Investor oder Finanzexperte – das erklärt Ihnen Akin am besten." },
+    { label: "🇬🇧 Akin 7 · деньги инвесторов", data: 'clips/en/cue7.mp3', half: true, text: "The money is deposited with asset management in Switzerland and put to work globally. As for dividends and everything else about the money: I'm a robot, not a professional investor or finance expert – Akin will explain that best." },
     { label: "🇩🇪 Akin 8 · размер рынка", data: 'clips/de/cue8.mp3', half: true, text: "Wenn man beide Märkte kombiniert, die noch so jungfräulich sind und auf die noch kein Versicherer einen Fokus setzt, sprechen wir von einem Markt, der über 200 Billionen wert ist." },
     { label: "🇬🇧 Akin 8 · размер рынка", data: 'clips/en/cue8.mp3', half: true, text: "If you combine both markets, which are still so untouched and which no insurer is focusing on yet, we are talking about a market worth more than 200 trillion." },
     { head: "Финал" },
@@ -575,7 +575,7 @@ function releaseBoard(msg){
   if(msg) log(msg);
 }
 // 1B (аудит 19.10): записи сцены — в память телефона сразу при открытии пульта. Сцене не нужен мозг — пусть не нужна и сеть.
-const KLIP_V='2210';   // переозвучил запись — поменяй метку (урок эфира 21.08)
+const KLIP_V='2210b';   // переозвучил запись — поменяй метку (урок эфира 21.08)
 function klipyVPamyat(){
   const vse=(ROBOT.clips||[]).filter(c=>c.data); let gotovo=0, oshibok=0;
   const pokaz=()=>{ const l=$('board')?.previousElementSibling;
